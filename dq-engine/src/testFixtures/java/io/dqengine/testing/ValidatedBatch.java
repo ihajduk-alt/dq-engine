@@ -3,6 +3,7 @@ package io.dqengine.testing;
 import io.dqengine.core.domain.Decision;
 import io.dqengine.core.domain.PartnerRecord;
 import io.dqengine.core.domain.RecordOutcome;
+import io.dqengine.core.domain.RuleError;
 import io.dqengine.core.domain.RunSummary;
 import io.dqengine.core.domain.ValidationResult;
 import io.dqengine.core.port.in.ValidationEngine;
@@ -23,6 +24,10 @@ public record ValidatedBatch(List<RecordOutcome> outcomes, RunSummary summary) {
 
     public List<ValidationResult> results() {
         return outcomes.stream().flatMap(outcome -> outcome.results().stream()).toList();
+    }
+
+    public List<RuleError> errors() {
+        return outcomes.stream().flatMap(outcome -> outcome.errors().stream()).toList();
     }
 
     public Optional<ValidationResult> result(String recordId, String ruleId) {

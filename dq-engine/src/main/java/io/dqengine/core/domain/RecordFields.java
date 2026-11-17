@@ -22,8 +22,13 @@ public final class RecordFields {
         return value;
     }
 
+    /** @throws IllegalArgumentException if the field is present but not a string */
     public Optional<String> text(String field) {
-        return value(field).map(String.class::cast);
+        Optional<Object> value = value(field);
+        if (value.isPresent() && !(value.get() instanceof String)) {
+            throw new IllegalArgumentException("field '" + field + "' is not a string");
+        }
+        return value.map(String.class::cast);
     }
 
     public List<FieldRead> reads() {
