@@ -1,13 +1,16 @@
 package io.dqengine.core.port.in;
 
+import io.dqengine.core.domain.InvalidRecordException;
 import io.dqengine.core.domain.PartnerRecord;
 import io.dqengine.core.domain.Provenance;
+import io.dqengine.core.domain.RecordError;
 import io.dqengine.core.domain.RecordFields;
 import io.dqengine.core.domain.RecordOutcome;
 import io.dqengine.core.domain.Rule;
 import io.dqengine.core.domain.RuleError;
 import io.dqengine.core.domain.RuleFilter;
 import io.dqengine.core.domain.RuleStatus;
+import io.dqengine.core.domain.RunSummary;
 import io.dqengine.core.domain.ValidationResult;
 import io.dqengine.core.port.out.RuleCatalog;
 import io.dqengine.core.port.out.RuleCatalogException;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import lombok.AccessLevel;
@@ -54,6 +58,37 @@ final class DefaultValidationEngine implements ValidationEngine {
             }
         }
         return new RecordOutcome(record.id(), results, errors);
+    }
+
+    @Override
+    public RunSummary validateAll(RecordSource records, int batchSize, RunListener listener) {
+        if (batchSize < 1) {
+            throw new IllegalArgumentException("batchSize must be positive");
+        }
+        RunSummary summary = RunSummary.empty();
+        while (true) {
+            long position = summary.records();
+            try {
+                Optional<PartnerRecord> record = records.next();
+                if (record.isEmpty()) {
+                    break;
+                }
+                RecordOutcome outcome = validate(record.get());
+                listener.outcome(position, outcome);
+                summary = summary.plus(outcome);
+            } catch (InvalidRecordException e) {
+                RecordError error = new RecordError(position, e.getMessage(), e);
+                listener.recordError(error);
+                summary = summary.plus(error);
+            }
+            if (summary.records() % batchSize == 0) {
+                listener.batchEnd(summary);
+            }
+        }
+        if (summary.records() % batchSize != 0) {
+            listener.batchEnd(summary);
+        }
+        return summary;
     }
 
     private static void evaluate(Rule rule, PartnerRecord record, List<ValidationResult> results,

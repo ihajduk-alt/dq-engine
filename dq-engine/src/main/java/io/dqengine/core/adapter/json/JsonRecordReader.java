@@ -2,6 +2,7 @@ package io.dqengine.core.adapter.json;
 
 import io.dqengine.core.domain.InvalidRecordException;
 import io.dqengine.core.domain.PartnerRecord;
+import io.dqengine.core.port.in.RecordSource;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +14,7 @@ import tools.jackson.databind.MappingIterator;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
-public final class JsonRecordReader implements AutoCloseable {
+public final class JsonRecordReader implements RecordSource, AutoCloseable {
 
     private static final JsonMapper MAPPER = JsonMapper.builder()
             .disable(StreamReadFeature.AUTO_CLOSE_SOURCE)
@@ -32,6 +33,7 @@ public final class JsonRecordReader implements AutoCloseable {
         return new JsonRecordReader(json);
     }
 
+    @Override
     public Optional<PartnerRecord> next() {
         JsonNode element;
         try {

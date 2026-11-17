@@ -28,6 +28,10 @@ public record RunSummary(long records, long results, long errors, Map<Decision, 
                 decisions, severities);
     }
 
+    public RunSummary plus(RecordError error) {
+        return new RunSummary(records + 1, results, errors + 1, byDecision, bySeverity);
+    }
+
     // An unmodifiable copy in enum order, with a zero for every missing constant
     private static <K extends Enum<K>> Map<K, Long> counts(Class<K> type, Map<K, Long> counts) {
         Map<K, Long> copy = new EnumMap<>(type);

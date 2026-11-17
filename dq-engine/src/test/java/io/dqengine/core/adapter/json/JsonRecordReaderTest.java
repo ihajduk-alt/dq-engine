@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
+// Reading one element at a time is proven by ScaleTest, which reads a million records in a 64 MB heap.
 class JsonRecordReaderTest {
 
     // Malformed or truncated input and stream ownership could get their own tests.
