@@ -18,6 +18,8 @@ public final class FixtureRecords {
     public static final PartnerRecord R4_NUMERIC_IBAN = new PartnerRecord(Map.of(
             "id", "r4", "vatId", "DE444444444", "country", "DE", "legalName", "Broken AG", "iban", 12345));
 
+    public static final String JSON_RESOURCE = "/fixtures/records.json";
+
     private FixtureRecords() {
     }
 

@@ -4,3 +4,7 @@ plugins {
 }
 
 description = "Data-quality rule engine"
+
+dependencies {
+    implementation(libs.jackson.databind)
+}
