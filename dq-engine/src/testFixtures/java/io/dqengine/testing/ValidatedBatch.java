@@ -4,6 +4,7 @@ import io.dqengine.core.domain.Decision;
 import io.dqengine.core.domain.PartnerRecord;
 import io.dqengine.core.domain.RecordOutcome;
 import io.dqengine.core.domain.RuleError;
+import io.dqengine.core.domain.RuleFilter;
 import io.dqengine.core.domain.RunSummary;
 import io.dqengine.core.domain.ValidationResult;
 import io.dqengine.core.port.in.ValidationEngine;
@@ -14,7 +15,12 @@ import java.util.Optional;
 public record ValidatedBatch(List<RecordOutcome> outcomes, RunSummary summary) {
 
     public static ValidatedBatch of(ValidationEngine engine, List<PartnerRecord> records) {
-        List<RecordOutcome> outcomes = records.stream().map(engine::validate).toList();
+        return of(engine, RuleFilter.all(), records);
+    }
+
+    public static ValidatedBatch of(ValidationEngine engine, RuleFilter filter, List<PartnerRecord> records) {
+        ValidationEngine selected = engine.select(filter);
+        List<RecordOutcome> outcomes = records.stream().map(selected::validate).toList();
         RunSummary summary = RunSummary.empty();
         for (RecordOutcome outcome : outcomes) {
             summary = summary.plus(outcome);

@@ -6,7 +6,8 @@ import lombok.Builder;
 
 /**
  * A named check: {@code logic} computes a value from a record, and {@code mapping} turns that value into a
- * {@link Decision}. Status defaults to {@link RuleStatus#DRAFT} and the country scope to {@link #WORLD}.
+ * {@link Decision}. Status defaults to {@link RuleStatus#DRAFT}, so a rule does nothing until it is released,
+ * and the country scope to {@link #WORLD}.
  */
 @Builder
 public record Rule(String id, String label, RuleStatus status, Severity severity, String countryScope,
