@@ -6,4 +6,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("dq-engine")
+include("dq-engine", "dq-example-http")
